@@ -1,6 +1,7 @@
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Created by Jeroen Stravers on 05-Jul-16.
@@ -11,6 +12,8 @@ public class KMeansClusterer {
             "exceeds the number of available datapoints -++-";
     private static final int INITIAL_ITERATION = 0;
     private static final int MAX_ITERATIONS = 10;
+    private static final int CLOSEST_CENTROID_INDEX = 0;
+    private static final int CLOSEST_CENTROID_DISTANCE = 1;
     private int k;
     private int iterations;
     private DataExtractor dataExtractor;
@@ -83,8 +86,64 @@ public class KMeansClusterer {
         return uniqueIndex;
     }
 
-    /**TODO
-     * hebt nu data extraction en centroid initialization
-     * moet euclidist, sse, centroid startpunt storage, output printing
+    /**assign each datapoint to it's closest centroid by calculating and comparing the euclidian distance to each
+     * centroid for each datapoint.
      * */
-}
+    private void assignDatapointsToClosestCentroids() {
+        for (Datapoint datapoint: dataExtractor.processedData) {
+            Centroid closestCentroid = findClosestCentroid(datapoint);
+            int datapointId = datapoint.getId();
+            closestCentroid.addDatapointToCentroid(datapointId, datapoint);
+        }
+    }
+
+    /** compare euclidian distances to find the centroid closest to the current datapoint
+     * */
+    private Centroid findClosestCentroid(Datapoint datapoint) {
+        Centroid closestCentroid = null;
+        float closestCentroidDistance = 0f;
+        for (int centroidIndex = 0; centroidIndex < centroids.size(); centroidIndex++) {
+            ArrayList<Float> datapointPosition = datapoint.getValues();
+            ArrayList<Float> centroidPosition = centroids.get(centroidIndex).getCurrentPosition();
+            float distanceToCentroid = computeEuclidianDistanceBetweenDatapointAndCentroidPosition(
+                    datapointPosition, centroidPosition);
+            if (distanceToCentroid < closestCentroidDistance || centroidIndex == INITIAL_ITERATION) {
+                closestCentroid = centroids.get(centroidIndex);
+                closestCentroidDistance = distanceToCentroid;
+            }
+        }
+        return closestCentroid;
+    }
+
+    /**calculate euclidian distance between a datapoint and a centroid*/
+    private float computeEuclidianDistanceBetweenDatapointAndCentroidPosition(
+            ArrayList<Float> datapointPosition, ArrayList<Float> centroidPosition) {
+        float totalSquaredDifference = 0f;
+        for(int i = 0; i < datapointPosition.size(); i++) {
+            float currentDifference = datapointPosition.get(i) - centroidPosition.get(i);
+            float currentSquaredDifference = currentDifference * currentDifference;
+            totalSquaredDifference += currentSquaredDifference;
+        }
+        float euclidianDistance = (float) Math.sqrt(totalSquaredDifference);
+        return euclidianDistance;
+    }
+
+    /**calculate the centroid position based on the average position of its constituent datapoints*/
+    private void computeCentroidPosition() {
+
+    }
+
+
+
+    /**flow:
+     * initialize
+     *
+     * loop 50-100x
+     *      loop for (iterations)
+         *      assign datapoints to closest centroid
+         *      recalculate centroid position
+         *      break all centroid positions don't change OR iterations reached
+     *      store results
+     *  display best result, print output
+     * */
+ }

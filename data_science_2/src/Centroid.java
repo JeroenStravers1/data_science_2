@@ -6,21 +6,24 @@ import java.util.HashMap;
  */
 public class Centroid {
 
-
-
     private ArrayList<Float> currentPosition;
-    private HashMap<String, Datapoint> pointsInCluster;
+    private HashMap<Integer, Datapoint> pointsInCluster;
 
     public Centroid() {
         currentPosition = new ArrayList<Float>();
-        pointsInCluster = new HashMap<String, Datapoint>();
+        pointsInCluster = new HashMap<Integer, Datapoint>();
     }
 
-    public ArrayList<Float> getCurrentPosition() {return currentPosition;}
-    public void setCurrentPosition(ArrayList<Float> currentPosition) {this.currentPosition = currentPosition;}
+    public ArrayList<Float> getCurrentPosition() {
+        return currentPosition;
+    }
 
-    public void addDatapointToCentroid() {
+    public void setCurrentPosition(ArrayList<Float> currentPosition) {
+        this.currentPosition = currentPosition;
+    }
 
+    public void addDatapointToCentroid(int datapointId, Datapoint datapoint) {
+        pointsInCluster.put(datapointId, datapoint);
     }
 
     public void removeDatapointFromCentroid(int datapointId) {
