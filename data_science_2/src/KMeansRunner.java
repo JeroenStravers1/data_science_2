@@ -32,18 +32,19 @@ public class KMeansRunner {
         if (kAndIterations != null) {
             dataExtractor.extractDataFromCSV();
             kMeansClusterer = new KMeansClusterer(dataExtractor, kAndIterations[K], kAndIterations[ITERATIONS]);
+            kMeansClusterer.performKMeansClustering();
         }
         System.out.println(SHUT_DOWN);
     }
 
     private int[] getKAndAmountOfIterations() {
-        Scanner user_input = new Scanner(System.in);
+        Scanner userInput = new Scanner(System.in);
         int k;
         int iterations;
         int[] storedInput = new int[REQUIRED_PARAMETERS];
         try {
-            k = getInputAsString(user_input, INPUT_K);
-            iterations = getInputAsString(user_input, INPUT_ITERATIONS);
+            k = getInputAsString(userInput, INPUT_K);
+            iterations = getInputAsString(userInput, INPUT_ITERATIONS);
             storedInput[K] = k;
             storedInput[ITERATIONS] = iterations;
         } catch(Exception e) {
@@ -55,7 +56,7 @@ public class KMeansRunner {
 
     private int getInputAsString(Scanner user_input, String message) {
         int input;
-        System.out.println(INPUT_K);
+        System.out.println(message);
         input = Integer.parseInt(user_input.next());
         return input;
     }

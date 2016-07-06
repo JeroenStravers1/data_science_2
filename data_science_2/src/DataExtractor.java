@@ -33,7 +33,7 @@ public class DataExtractor {
         //for (LinkedList<Float> row: unprocessedData){System.out.println(row);}
         // show datapoints created and content
         //System.out.println(processedData.size());
-        //for (Datapoint point: processedData){System.out.println(point.getValues());}
+        //for (Datapoint point: processedData){System.out.println(point.getPosition());}
     }
 
     /**
@@ -73,15 +73,12 @@ public class DataExtractor {
      */
     private void convertUnprocessedDataToDatapoints() {
         int datapointsRemaining = unprocessedData.get(FIRST_ROW).size();
-        int currentDatapointId = 0;
         while (datapointsRemaining != EMPTY) {
             ArrayList<Float> currentDatapointValues = convertUnprocessedDataToDatapointValues();
             Datapoint currentDatapoint = DatapointFactory.createDatapoint();
-            currentDatapoint.setId(currentDatapointId);
-            currentDatapoint.setValues(currentDatapointValues);
+            currentDatapoint.setPosition(currentDatapointValues);
             processedData.add(currentDatapoint);
             datapointsRemaining -= VALUE_CONSUMED;
-            currentDatapointId++;
         }
     }
 

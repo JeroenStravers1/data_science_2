@@ -7,11 +7,11 @@ import java.util.HashMap;
 public class Centroid {
 
     private ArrayList<Float> currentPosition;
-    private HashMap<Integer, Datapoint> pointsInCluster;
+    private ArrayList<Datapoint> pointsInCluster;
 
     public Centroid() {
         currentPosition = new ArrayList<Float>();
-        pointsInCluster = new HashMap<Integer, Datapoint>();
+        pointsInCluster = new ArrayList<Datapoint>();
     }
 
     public ArrayList<Float> getCurrentPosition() {
@@ -22,11 +22,19 @@ public class Centroid {
         this.currentPosition = currentPosition;
     }
 
-    public void addDatapointToCentroid(int datapointId, Datapoint datapoint) {
-        pointsInCluster.put(datapointId, datapoint);
+    public void addDatapoint(Datapoint datapoint) {
+        pointsInCluster.add(datapoint);
     }
 
     public void removeDatapointFromCentroid(int datapointId) {
 
+    }
+
+    public ArrayList<Datapoint> getCentroidDatapoints() {
+        return pointsInCluster;
+    }
+
+    public void clearDatapoints() {
+        pointsInCluster.clear();
     }
 }

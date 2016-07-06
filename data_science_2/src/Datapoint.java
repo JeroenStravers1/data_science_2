@@ -5,22 +5,23 @@ import java.util.ArrayList;
  */
 public class Datapoint {
 
-    private ArrayList<Float> values;
-    private int id;
+    private ArrayList<Float> position;
+    private Centroid centroid;
 
-    public ArrayList<Float> getValues() {
-        return values;
+    public ArrayList<Float> getPosition() {
+        return position;
     }
 
-    public void setValues(ArrayList<Float> values) {
-        this.values = values;
+    public void setPosition(ArrayList<Float> position) {
+        this.position = position;
     }
 
-    public int getId() {
-        return id;
+    public Centroid getCentroid() {
+        return centroid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setCentroid(Centroid centroid) {
+        this.centroid = centroid;
     }
+
 }

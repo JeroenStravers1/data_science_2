@@ -1,7 +1,4 @@
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by Jeroen Stravers on 05-Jul-16.
@@ -12,8 +9,7 @@ public class KMeansClusterer {
             "exceeds the number of available datapoints -++-";
     private static final int INITIAL_ITERATION = 0;
     private static final int MAX_ITERATIONS = 10;
-    private static final int CLOSEST_CENTROID_INDEX = 0;
-    private static final int CLOSEST_CENTROID_DISTANCE = 1;
+    private static final float ACCEPTABLE_ERROR =  0.000000001f;
     private int k;
     private int iterations;
     private DataExtractor dataExtractor;
@@ -27,11 +23,28 @@ public class KMeansClusterer {
         this.numberOfDatapoints = dataExtractor.processedData.size();
     }
 
-    protected void performKMeansClustering() {
-        if (k < numberOfDatapoints){
-            initializeClusterer();
-        }
-        else {
+    protected void performKMeansClustering() { // pakt iterations, stopt als centroids niet meer veranderen.
+        if (k < numberOfDatapoints) {
+            float lowestSSE = 0f;
+            ArrayList<Centroid> lowestSSECentroidPositions = new ArrayList<Centroid>();
+            for (int i = 0; i < iterations; i++) {
+                boolean centroidPositionsNoLongerShifting = false;
+                initializeClusterer();
+                while (!centroidPositionsNoLongerShifting) {
+                    assignDatapointsToClosestCentroids();
+                    centroidPositionsNoLongerShifting = updateCentroidPositions();
+
+                }
+                for (Centroid centroid:centroids){System.out.println(centroid.getCentroidDatapoints().size());}
+                float currentSSE = calculateSumOfSquaredErrors();
+                if (currentSSE < lowestSSE || i == INITIAL_ITERATION) {
+                    lowestSSE = currentSSE;
+                    lowestSSECentroidPositions = centroids;
+                }
+
+                // TODO implement printing best output
+            }
+        } else {
             System.out.println(CLUSTERS_EQUAL_OR_GREATER_THAN_DATAPOINTS);
         }
     }
@@ -44,29 +57,29 @@ public class KMeansClusterer {
     /**I used the Forgy method to initialize centroid positions; I randomly select k datapoints as the initial
      * centroid positions.
      * */
-    private void initializeCentroids() {
+    private void initializeCentroids() { //TODO +++
         HashMap<Integer, Integer> usedIndices = new HashMap<Integer, Integer>();
         for (int i = 0; i < k; i++) {
             Centroid centroid = new Centroid();
             int centroidPosition = generateCentroidStartPosition(usedIndices, INITIAL_ITERATION);
-            ArrayList<Float> selectedDatapointPosition = dataExtractor.processedData.get(centroidPosition).getValues();
+            ArrayList<Float> selectedDatapointPosition = dataExtractor.processedData.get(centroidPosition).getPosition();
             centroid.setCurrentPosition(selectedDatapointPosition);
             centroids.add(centroid);
         }
     }
 
-    /**Generates the index of the datapoint to be used as the current centroid's starting position.
+    /**Generates the index of the datapoint to be used as the current centroid's starting position. //TODO +++
      * I used recursion to ensure a randomly generated index
      * */
-    private int generateCentroidStartPosition(HashMap<Integer, Integer> usedIndices, int iterations) {
-        iterations++;
-        if (iterations < MAX_ITERATIONS){
-            int randomIndex = (int) Math.random() * numberOfDatapoints;
+    private int generateCentroidStartPosition(HashMap<Integer, Integer> usedIndices, int positionGenerationIteration) {
+        positionGenerationIteration++;
+        if (positionGenerationIteration < MAX_ITERATIONS){
+            int randomIndex = (int) (Math.random() * numberOfDatapoints);
             if (usedIndices.containsKey(randomIndex) == false) {
                 return randomIndex;
             }
             else {
-                return generateCentroidStartPosition(usedIndices, iterations);
+                return generateCentroidStartPosition(usedIndices, positionGenerationIteration);
             }
         }
         else {
@@ -74,7 +87,7 @@ public class KMeansClusterer {
         }
     }
 
-    /**included solely to break a theoretically possible infinite loop*/
+    /**included solely to break a theoretically possible infinite loop*/ //TODO +++
     private int generateFirstViableIndex(HashMap<Integer, Integer> usedIndices) {
         int uniqueIndex = 0;
         for (int i = 0; i < numberOfDatapoints; i++) {
@@ -90,10 +103,12 @@ public class KMeansClusterer {
      * centroid for each datapoint.
      * */
     private void assignDatapointsToClosestCentroids() {
+        for (Centroid centroid: centroids) {
+            centroid.clearDatapoints();
+        }
         for (Datapoint datapoint: dataExtractor.processedData) {
             Centroid closestCentroid = findClosestCentroid(datapoint);
-            int datapointId = datapoint.getId();
-            closestCentroid.addDatapointToCentroid(datapointId, datapoint);
+            closestCentroid.addDatapoint(datapoint);
         }
     }
 
@@ -103,7 +118,7 @@ public class KMeansClusterer {
         Centroid closestCentroid = null;
         float closestCentroidDistance = 0f;
         for (int centroidIndex = 0; centroidIndex < centroids.size(); centroidIndex++) {
-            ArrayList<Float> datapointPosition = datapoint.getValues();
+            ArrayList<Float> datapointPosition = datapoint.getPosition();
             ArrayList<Float> centroidPosition = centroids.get(centroidIndex).getCurrentPosition();
             float distanceToCentroid = computeEuclidianDistanceBetweenDatapointAndCentroidPosition(
                     datapointPosition, centroidPosition);
@@ -129,21 +144,81 @@ public class KMeansClusterer {
     }
 
     /**calculate the centroid position based on the average position of its constituent datapoints*/
-    private void computeCentroidPosition() {
+    private boolean updateCentroidPositions() {
+        boolean centroidPositionsUnchanged = false;
+        for (Centroid centroid: centroids) {
+            ArrayList<Float> updatedCentroidPosition = calculateAveragePositionOfCentroidDatapoints(centroid);
+            if (centroidPositionUnchanged(centroid, updatedCentroidPosition)) {
+                centroidPositionsUnchanged = true;
+            }
+            else {
+                centroidPositionsUnchanged = false;
+            }
+            centroid.setCurrentPosition(updatedCentroidPosition);
+        }
+        return centroidPositionsUnchanged;
+    }
+
+    /**calculate the average position of the centroid
+     * */
+    private ArrayList<Float> calculateAveragePositionOfCentroidDatapoints(Centroid centroid) {
+        int centroidDatapointsAmount = centroid.getCentroidDatapoints().size();                     // pak aantal klanten
+        ArrayList<Float> summedDimensionScores = sumCentroidDatapointDimensionScores(centroid);     //
+        ArrayList<Float> averageDimensionScores = new ArrayList<Float>();
+        for (int i = 0; i < summedDimensionScores.size(); i++) {
+            float averageDimensionScore = summedDimensionScores.get(i) / centroidDatapointsAmount;
+            averageDimensionScores.add(averageDimensionScore);
+        }
+        return averageDimensionScores;
 
     }
 
-
-
-    /**flow:
-     * initialize
-     *
-     * loop 50-100x
-     *      loop for (iterations)
-         *      assign datapoints to closest centroid
-         *      recalculate centroid position
-         *      break all centroid positions don't change OR iterations reached
-     *      store results
-     *  display best result, print output
+    /**extract the summed dimension scores of a centroid's datapoints
      * */
- }
+    private ArrayList<Float> sumCentroidDatapointDimensionScores(Centroid centroid) {
+        ArrayList<Datapoint> currentCentroidDatapoints = centroid.getCentroidDatapoints();
+        ArrayList<Float> totalScore = new ArrayList<Float>();
+        int numberOfDimensions = currentCentroidDatapoints.get(INITIAL_ITERATION).getPosition().size();
+        for (int i = 0; i < numberOfDimensions; i++) {
+            float totalScoreForDimension = 0f;
+            for (Datapoint datapoint: currentCentroidDatapoints) {
+                totalScoreForDimension += datapoint.getPosition().get(i);
+            }
+            totalScore.add(totalScoreForDimension);
+
+        }
+        return totalScore;
+    }
+
+    /**checks if the updated position of the centroid on all dimensions is different from it's current position
+     * */
+    private boolean centroidPositionUnchanged(Centroid centroid, ArrayList<Float> updatedCentroidPosition) {
+        ArrayList<Float> currentCentroidPosition = centroid.getCurrentPosition();
+        boolean updatedPositionIdenticalToCurrentPosition = true;
+        for (int i = 0; i < currentCentroidPosition.size(); i++) {
+            float differenceBetweenPositionsForDimension = Math.abs(currentCentroidPosition.get(i) -
+                    updatedCentroidPosition.get(i));
+            if(!(differenceBetweenPositionsForDimension < ACCEPTABLE_ERROR)) {
+                updatedPositionIdenticalToCurrentPosition = false;
+            }
+        }
+        return updatedPositionIdenticalToCurrentPosition;
+    }
+
+    /**calculate sse*/
+    private float calculateSumOfSquaredErrors() {
+        float sumOfSquaredErrors = 0f;
+        for(Centroid centroid: centroids) {
+            ArrayList<Float> centroidPosition = centroid.getCurrentPosition();
+            ArrayList<Datapoint> datapoints = centroid.getCentroidDatapoints();
+            for (Datapoint datapoint: datapoints) {
+                ArrayList datapointPosition = datapoint.getPosition();
+                float euclidianDistance = computeEuclidianDistanceBetweenDatapointAndCentroidPosition(
+                        datapointPosition, centroidPosition);
+                float squaredError = euclidianDistance * euclidianDistance;
+                sumOfSquaredErrors += squaredError;
+            }
+        }
+        return sumOfSquaredErrors;
+    }
+}
