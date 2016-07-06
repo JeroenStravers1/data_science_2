@@ -23,7 +23,9 @@ public class KMeansClusterer {
         this.numberOfDatapoints = dataExtractor.processedData.size();
     }
 
-    protected void performKMeansClustering() { // pakt iterations, stopt als centroids niet meer veranderen.
+    /**performs k means clustering, returns the clustered result with the lowest SSE*/
+    protected Vector performKMeansClustering() {
+        Vector bestFoundCentroidsAndSSE = null;
         if (k < numberOfDatapoints) {
             float lowestSSE = 0f;
             ArrayList<Centroid> lowestSSECentroidPositions = new ArrayList<Centroid>();
@@ -33,20 +35,20 @@ public class KMeansClusterer {
                 while (!centroidPositionsNoLongerShifting) {
                     assignDatapointsToClosestCentroids();
                     centroidPositionsNoLongerShifting = updateCentroidPositions();
-
                 }
                 for (Centroid centroid:centroids){System.out.println(centroid.getCentroidDatapoints().size());}
                 float currentSSE = calculateSumOfSquaredErrors();
                 if (currentSSE < lowestSSE || i == INITIAL_ITERATION) {
                     lowestSSE = currentSSE;
                     lowestSSECentroidPositions = centroids;
+                    bestFoundCentroidsAndSSE.add(lowestSSECentroidPositions);
+                    bestFoundCentroidsAndSSE.add(lowestSSE);
                 }
-
-                // TODO implement printing best output
             }
         } else {
             System.out.println(CLUSTERS_EQUAL_OR_GREATER_THAN_DATAPOINTS);
         }
+        return bestFoundCentroidsAndSSE;
     }
 
     private void initializeClusterer() {
