@@ -16,15 +16,13 @@ public class DataExtractor {
     private static final int EMPTY = 0;
     private static final int VALUE_CONSUMED = 1;
 
-    private ArrayList<LinkedList<Integer>> unprocessedData;
-    private ArrayList<Datapoint> processedData;
-
+    private ArrayList<LinkedList<Float>> unprocessedData;
+    protected ArrayList<Datapoint> processedData;
 
     public DataExtractor() {
-        unprocessedData = new ArrayList<LinkedList<Integer>>(); // arraylists are faster for traversing, linkedlists are faster when adding/removing from start/end
+        unprocessedData = new ArrayList<LinkedList<Float>>(); // arraylists are faster for traversing, linkedlists are faster when adding/removing from start/end
         processedData = new ArrayList<Datapoint>();
     }
-
 
     public void extractDataFromCSV() {
         getDataAsIntegersFromCSV();
@@ -32,12 +30,11 @@ public class DataExtractor {
         // TODO for assessment purposes:
         // show linkedlists created and emptied
         //System.out.println(unprocessedData.size());
-        //for (LinkedList<Integer> row: unprocessedData){System.out.println(row);}
+        //for (LinkedList<Float> row: unprocessedData){System.out.println(row);}
         // show datapoints created and content
         //System.out.println(processedData.size());
         //for (Datapoint point: processedData){System.out.println(point.getValues());}
     }
-
 
     /**
      * reads a csv file as linkedlist(list(int). LinkedLists have O(1) time for adding to the end of the list.
@@ -45,14 +42,14 @@ public class DataExtractor {
     private void getDataAsIntegersFromCSV() {
         BufferedReader br = null;
         String line;
-        LinkedList<Integer> currentRow;
+        LinkedList<Float> currentRow;
         try {
             br = new BufferedReader(new FileReader(CSV_PATH));
             while ((line = br.readLine()) != null) {
-                currentRow = new LinkedList<Integer>();
+                currentRow = new LinkedList<Float>();
                 String[] splitValues = line.split(CSV_DELIMITER);
                 for (String currentValue : splitValues) {
-                    currentRow.add(Integer.parseInt(currentValue));
+                    currentRow.add(Float.parseFloat(currentValue));
                 }
                 unprocessedData.add(currentRow);
             }
@@ -71,22 +68,30 @@ public class DataExtractor {
         }
     }
 
-
     /**
      * assumes all row lengths are identical.
      */
     private void convertUnprocessedDataToDatapoints() {
         int datapointsRemaining = unprocessedData.get(FIRST_ROW).size();
+        int currentDatapointId = 0;
         while (datapointsRemaining != EMPTY) {
-            ArrayList<Integer> currentDatapointValues = new ArrayList<Integer>();
-            for (LinkedList<Integer> currentRow : unprocessedData) {
-                int currentColumnRowValue = currentRow.getFirst();
-                currentDatapointValues.add(currentColumnRowValue);
-                currentRow.removeFirst();
-            }
-            Datapoint currentDatapoint = DatapointFactory.createDatapoint(currentDatapointValues);
+            ArrayList<Float> currentDatapointValues = convertUnprocessedDataToDatapointValues();
+            Datapoint currentDatapoint = DatapointFactory.createDatapoint();
+            currentDatapoint.setId(currentDatapointId);
+            currentDatapoint.setValues(currentDatapointValues);
             processedData.add(currentDatapoint);
             datapointsRemaining -= VALUE_CONSUMED;
+            currentDatapointId++;
         }
+    }
+
+    private ArrayList<Float> convertUnprocessedDataToDatapointValues() {
+        ArrayList<Float> currentDatapointValues = new ArrayList<Float>();
+        for (LinkedList<Float> currentRow: unprocessedData) {
+            float currentColumnRowValue = currentRow.getFirst();
+            currentDatapointValues.add(currentColumnRowValue);
+            currentRow.removeFirst();
+        }
+        return currentDatapointValues;
     }
 }

@@ -5,18 +5,22 @@ import java.util.ArrayList;
  */
 public class Datapoint {
 
-    private ArrayList<Integer> values;
+    private ArrayList<Float> values;
+    private int id;
 
-
-    public Datapoint(ArrayList<Integer> values) {
-        this.values = values;
-    }
-
-    public ArrayList<Integer> getValues() {
+    public ArrayList<Float> getValues() {
         return values;
     }
 
-    public void setValues(ArrayList<Integer> values) {
+    public void setValues(ArrayList<Float> values) {
         this.values = values;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

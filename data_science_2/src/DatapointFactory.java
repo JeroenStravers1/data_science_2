@@ -5,8 +5,8 @@ import java.util.ArrayList;
  */
 public class DatapointFactory {
 
-    public static Datapoint createDatapoint(ArrayList<Integer> values) {
-        Datapoint datapoint = new Datapoint(values);
+    public static Datapoint createDatapoint() {
+        Datapoint datapoint = new Datapoint();
         return datapoint;
     }
 }
