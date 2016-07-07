@@ -1,4 +1,5 @@
-import java.lang.reflect.Array;
+package k_means_clustering;
+
 import java.util.*;
 
 /**

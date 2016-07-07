@@ -1,3 +1,5 @@
+package k_means_clustering;
+
 import java.util.Scanner;
 import java.util.Vector;
 

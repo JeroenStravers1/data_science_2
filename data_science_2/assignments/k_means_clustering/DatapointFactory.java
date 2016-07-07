@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+package k_means_clustering;
 
 /**
  * Created by Jeroen Stravers on 05-Jul-16.

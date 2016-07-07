@@ -1,5 +1,6 @@
+package k_means_clustering;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Jeroen Stravers on 05-Jul-16.
