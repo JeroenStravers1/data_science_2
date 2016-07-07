@@ -53,11 +53,12 @@
       <file leaf-file-name="GeneticAlgorithm.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/GeneticAlgorithm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.058139537" vertical-offset="628" max-vertical-offset="1360">
-              <caret line="39" column="41" selection-start-line="39" selection-start-column="41" selection-end-line="39" selection-end-column="41" />
+            <state vertical-scroll-proportion="0.7009967" vertical-offset="1737" max-vertical-offset="2533">
+              <caret line="127" column="25" selection-start-line="127" selection-start-column="25" selection-end-line="127" selection-end-column="25" />
               <folding>
-                <element signature="e#2613#2614#0" expanded="true" />
-                <element signature="e#2652#2653#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#5379#5380#0" expanded="true" />
+                <element signature="e#5418#5419#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -542,12 +543,12 @@
       <workItem from="1467797541115" duration="10883000" />
       <workItem from="1467812985955" duration="4071000" />
       <workItem from="1467886479282" duration="5585000" />
-      <workItem from="1467894473420" duration="3653000" />
+      <workItem from="1467894473420" duration="6790000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34363000" />
+    <option name="totallyTimeSpent" value="37500000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -892,6 +893,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/IndividualFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
+          <caret line="7" column="53" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/PostProcessor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="112" max-vertical-offset="833">
+          <caret line="14" column="10" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/Individual.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="595">
@@ -909,29 +926,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/IndividualFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
-          <caret line="7" column="53" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/PostProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="112" max-vertical-offset="833">
-          <caret line="14" column="10" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/assignments/genetic_algorithm/GeneticAlgorithm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.058139537" vertical-offset="628" max-vertical-offset="1360">
-          <caret line="39" column="41" selection-start-line="39" selection-start-column="41" selection-end-line="39" selection-end-column="41" />
+        <state vertical-scroll-proportion="0.7009967" vertical-offset="1737" max-vertical-offset="2533">
+          <caret line="127" column="25" selection-start-line="127" selection-start-column="25" selection-end-line="127" selection-end-column="25" />
           <folding>
-            <element signature="e#2613#2614#0" expanded="true" />
-            <element signature="e#2652#2653#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#5379#5380#0" expanded="true" />
+            <element signature="e#5418#5419#0" expanded="true" />
           </folding>
         </state>
       </provider>
