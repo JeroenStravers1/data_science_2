@@ -18,6 +18,7 @@ public class DataExtractor {
 
     private ArrayList<LinkedList<Float>> unprocessedData;
     protected ArrayList<Datapoint> processedData;
+    protected int numberOfDimensions;
 
     public DataExtractor() {
         unprocessedData = new ArrayList<LinkedList<Float>>(); // arraylists are faster for traversing, linkedlists are faster when adding/removing from start/end
@@ -26,14 +27,8 @@ public class DataExtractor {
 
     public void extractDataFromCSV() {
         getDataAsIntegersFromCSV();
+        numberOfDimensions = unprocessedData.size();
         convertUnprocessedDataToDatapoints();
-        // TODO for assessment purposes:
-        // show linkedlists created and emptied
-        //System.out.println(unprocessedData.size());
-        //for (LinkedList<Float> row: unprocessedData){System.out.println(row);}
-        // show datapoints created and content
-        //System.out.println(processedData.size());
-        //for (Datapoint point: processedData){System.out.println(point.getPosition());}
     }
 
     /**

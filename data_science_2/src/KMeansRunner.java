@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Vector;
 
 public class KMeansRunner {
 
@@ -14,6 +15,7 @@ public class KMeansRunner {
 
     private DataExtractor dataExtractor;
     private KMeansClusterer kMeansClusterer;
+    private PostProcessor postProcessor;
 
 
     public static void main(String[] args) {
@@ -23,6 +25,7 @@ public class KMeansRunner {
 
     public KMeansRunner() {
         dataExtractor = new DataExtractor();
+        postProcessor = new PostProcessor();
     }
 
     private void runKMeans() {
@@ -32,11 +35,13 @@ public class KMeansRunner {
         if (kAndIterations != null) {
             dataExtractor.extractDataFromCSV();
             kMeansClusterer = new KMeansClusterer(dataExtractor, kAndIterations[K], kAndIterations[ITERATIONS]);
-            kMeansClusterer.performKMeansClustering();
+            Vector clusteredResults = kMeansClusterer.performKMeansClustering();
+            postProcessor.processClusteredResult(clusteredResults);
         }
         System.out.println(SHUT_DOWN);
     }
 
+    /**prompt user to input K and amount of desired iterations*/
     private int[] getKAndAmountOfIterations() {
         Scanner userInput = new Scanner(System.in);
         int k;

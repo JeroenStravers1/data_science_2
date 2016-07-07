@@ -8,6 +8,7 @@ public class KMeansClusterer {
     private static final String CLUSTERS_EQUAL_OR_GREATER_THAN_DATAPOINTS = "-++- The specified number of clusters " +
             "exceeds the number of available datapoints -++-";
     private static final int INITIAL_ITERATION = 0;
+    private static final int EMPTY = 0;
     private static final int MAX_ITERATIONS = 10;
     private static final float ACCEPTABLE_ERROR =  0.000000001f;
     private int k;
@@ -15,17 +16,19 @@ public class KMeansClusterer {
     private DataExtractor dataExtractor;
     private ArrayList<Centroid> centroids;
     private int numberOfDatapoints;
+    private int numberOfDimensions;
 
     public KMeansClusterer(DataExtractor dataExtractor, int k, int iterations) {
         this.k = k;
         this.iterations = iterations;
         this.dataExtractor = dataExtractor;
         this.numberOfDatapoints = dataExtractor.processedData.size();
+        this.numberOfDimensions = dataExtractor.numberOfDimensions;
     }
 
-    /**performs k means clustering, returns the clustered result with the lowest SSE*/
+    /**performs k means clustering, returns the clustered result with the lowest SSE and number of dimensions*/
     protected Vector performKMeansClustering() {
-        Vector bestFoundCentroidsAndSSE = null;
+        Vector bestFoundCentroidsAndSSE = new Vector();
         if (k < numberOfDatapoints) {
             float lowestSSE = 0f;
             ArrayList<Centroid> lowestSSECentroidPositions = new ArrayList<Centroid>();
@@ -36,21 +39,23 @@ public class KMeansClusterer {
                     assignDatapointsToClosestCentroids();
                     centroidPositionsNoLongerShifting = updateCentroidPositions();
                 }
-                for (Centroid centroid:centroids){System.out.println(centroid.getCentroidDatapoints().size());}
                 float currentSSE = calculateSumOfSquaredErrors();
                 if (currentSSE < lowestSSE || i == INITIAL_ITERATION) {
                     lowestSSE = currentSSE;
                     lowestSSECentroidPositions = centroids;
-                    bestFoundCentroidsAndSSE.add(lowestSSECentroidPositions);
-                    bestFoundCentroidsAndSSE.add(lowestSSE);
+
                 }
             }
+            bestFoundCentroidsAndSSE.add(lowestSSECentroidPositions);
+            bestFoundCentroidsAndSSE.add(lowestSSE);
+            bestFoundCentroidsAndSSE.add(numberOfDimensions);
         } else {
             System.out.println(CLUSTERS_EQUAL_OR_GREATER_THAN_DATAPOINTS);
         }
         return bestFoundCentroidsAndSSE;
     }
 
+    /**reset the list of centroids, determine their starting positions*/
     private void initializeClusterer() {
         centroids = new ArrayList<Centroid>();
         initializeCentroids();
@@ -161,15 +166,21 @@ public class KMeansClusterer {
         return centroidPositionsUnchanged;
     }
 
-    /**calculate the average position of the centroid
+    /**calculate the average position of the centroid, don't change it's position if it no longer has any datapoints
      * */
     private ArrayList<Float> calculateAveragePositionOfCentroidDatapoints(Centroid centroid) {
-        int centroidDatapointsAmount = centroid.getCentroidDatapoints().size();                     // pak aantal klanten
-        ArrayList<Float> summedDimensionScores = sumCentroidDatapointDimensionScores(centroid);     //
+        int centroidDatapointsAmount = centroid.getCentroidDatapoints().size();
         ArrayList<Float> averageDimensionScores = new ArrayList<Float>();
-        for (int i = 0; i < summedDimensionScores.size(); i++) {
-            float averageDimensionScore = summedDimensionScores.get(i) / centroidDatapointsAmount;
-            averageDimensionScores.add(averageDimensionScore);
+        if (centroidDatapointsAmount > EMPTY) {
+            ArrayList<Float> summedDimensionScores = sumCentroidDatapointDimensionScores(centroid);     //
+
+            for (int i = 0; i < summedDimensionScores.size(); i++) {
+                float averageDimensionScore = summedDimensionScores.get(i) / centroidDatapointsAmount;
+                averageDimensionScores.add(averageDimensionScore);
+            }
+        }
+        else {
+            averageDimensionScores = centroid.getCurrentPosition();
         }
         return averageDimensionScores;
 
