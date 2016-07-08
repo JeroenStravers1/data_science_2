@@ -1,7 +1,5 @@
 package genetic_algorithm;
 
-import com.sun.org.apache.bcel.internal.generic.POP;
-
 import java.util.Random;
 
 /**
@@ -9,20 +7,22 @@ import java.util.Random;
  */
 public class GeneticAlgorithm {
 
-    private static final int POPULATION_SIZE = 32;
     private static final int GENE_SIZE = 5;
     private static final int GENE_OPTIONS = 2;
     private static final int PARENTS = 2;
-/*
-    Func<Ind> createIndividual ==> input is nothing, output is a new individual;
-     Func<Ind,double> computeFitness ==> input is one individual, output is its fitness;
-     Func<Ind[],double[],Func<Tuple<Ind,Ind>>> selectTwoParents ==> input is an array of individuals (population)
-    and an array of corresponding fitnesses, output is a function which (without any input) returns a tuple with two
-    individuals (parents);
-     Func<Tuple<Ind, Ind>, Tuple<Ind, Ind>> crossover ==> input is a tuple with two individuals (parents), output is a
-    tuple with two individuals (offspring/children);
-     Func<Ind, double, Ind> mutation ==> input is one individual and mutation rate, output is the mutated individual
-*/
+    private static final int FIRST = 0;
+    private static final int SECOND = 1;
+    private static final int NEXT = 1;
+    private static final int LOWER_BOUND = 1;
+    private static final int UPPER_BOUND = 2;
+    private static final int SEQUENCE_START = 0;
+    private static final double HALF = 0.5;
+    private static final int DOUBLE = 2;
+    private static final String ACTIVE = "1";
+    private static final String INACTIVE = "0";
+    private static final String RESULT_AVERAGE_FITNESS = "The average fitness for the last population is ";
+    private static final String RESULT_BEST_INDIVIDUAL_SEQUENCE = "The best Individual's genesequence is ";
+    private static final String RESULT_BEST_INDIVIDUAL_FITNESS = "The best Individual's fitness is ";
 
     double crossoverRate;
     double mutationRate;
@@ -41,29 +41,65 @@ public class GeneticAlgorithm {
         rand =  new Random();
     }
 
-    public void run(int iterations) {
+    public void runForNumIterations() {
         String[] initialGenePool = generateInitialGenes();
         Individual[] population = createPopulation(initialGenePool);
-        /**hier komt de for loop (iterations/convergence)*/
-        // calc pop fitness
-        float[] populationFitness = new float[POPULATION_SIZE];
-        for(int i = 0; i < POPULATION_SIZE; i++) {
-            populationFitness[i] = computeFitness(population[i]);
+        for(Individual indy:population){print("INITPOP " + indy.getGeneSequence());}
+        float[] populationFitness = calculateFitnessForEachIndividual(population);
+        for (int i = 0; i < numIterations; i++){
+            Individual[] newPopulation = new Individual[populationSize];
+            int startPopulationIndex = 0;
+            if (elitism) {
+                int bestIndividualIndex = getBestIndividualIndex(populationFitness);
+                newPopulation[FIRST] = population[bestIndividualIndex];
+                startPopulationIndex = 1;
+            }
+            for(int k = startPopulationIndex; k < populationSize; k+=2) {
+                // get parents
+                Individual[] selectedParents = selectTwoParents(population, populationFitness);
+                System.out.println("selpar" +selectedParents[0] + selectedParents[1]);
+                // crossover
+                Individual[] offspring = crossover(selectedParents);
+                System.out.println("seloff" +offspring[0] + offspring[1]);
+                // mutate
+                for (Individual individual: offspring) {
+                    String currentGeneSequence = individual.getGeneSequence();
+                    String mutatedGeneSequence = mutateGeneSequence(currentGeneSequence);
+                    individual.setGeneSequence(mutatedGeneSequence);
+                }
+                // store in population
+                newPopulation[k] = offspring[FIRST];
+                try{
+                    newPopulation[k + NEXT] = offspring[SECOND];
+                }
+                catch(Exception e) {} // only there for uneven population sizes
+
+            }
+            population = newPopulation;
+            // calculate fitness
+            print("\n-----");
+            for(Individual in: population) System.out.println("population"+in);
+
+            populationFitness = calculateFitnessForEachIndividual(population);
         }
-        // parents
-        selectTwoParents(population, populationFitness);
-
-
-
-
-
+        float totalPopulationFitness = calculateSumOfPopulationFitness(populationFitness);
+        float averagePopulationFitness = totalPopulationFitness / populationSize;
+        System.out.println(RESULT_AVERAGE_FITNESS + averagePopulationFitness);
+        int bestIndividualIndex = 0;
+        for (int i = 0; i < populationSize; i++) {
+            if (populationFitness[i] > populationFitness[bestIndividualIndex]) {
+                bestIndividualIndex = i;
+            }
+        }
+        System.out.println(RESULT_BEST_INDIVIDUAL_SEQUENCE + population[bestIndividualIndex].getGeneSequence());
+        System.out.println(RESULT_BEST_INDIVIDUAL_FITNESS + populationFitness[bestIndividualIndex]);
     }
 
     /**generate a list of random genesequences for the initial population*/ //TODO +
     private String[] generateInitialGenes() {
         Random rand = new Random();
-        String[] generatedGenes = new String[POPULATION_SIZE];
-        for (int i = 0; i < POPULATION_SIZE; i++) {
+        String[] generatedGenes = new String[populationSize];
+        for (int i = 0; i < populationSize; i++) {
             String geneSequence = "";
             for (int j = 0; j < GENE_SIZE; j++){
                 int gene = rand.nextInt(GENE_OPTIONS);
@@ -76,67 +112,151 @@ public class GeneticAlgorithm {
 
     /**create population from geneSequences*/ //TODO+
     private Individual[] createPopulation(String[] geneSequences) {
-        Individual[] population = new Individual[POPULATION_SIZE];
-        for(int i = 0; i < POPULATION_SIZE; i++) {
+        Individual[] population = new Individual[populationSize];
+        for(int i = 0; i < populationSize; i++) {
             population[i] = IndividualFactory.spawnIndividualWithGenes(geneSequences[i]);
         }
         return population;
     }
 
-    /**calculate fitness of an individual*/
+    /**calculate fitness for each member of the population*/ // TODO +
+    private float[] calculateFitnessForEachIndividual(Individual[] population) {
+        float[] populationFitness = new float[populationSize];
+        for(int j = 0; j < populationSize; j++) {
+            populationFitness[j] = computeFitness(population[j]);
+        }
+        return populationFitness;
+    }
+
+    /**calculate fitness of an individual*/ // TODO +
     private float computeFitness(Individual individual) {
         int interpretedGeneSequence = Integer.parseInt(individual.getGeneSequence(), 2);
         float fitness = (-1 * (interpretedGeneSequence * interpretedGeneSequence)) + (7 * interpretedGeneSequence);
         return fitness;
     }
 
+    /**get the index identifying the most fit individual*/
+    private int getBestIndividualIndex(float[] populationFitness) {
+        int bestIndividualIndex = 0;
+        for (int i = 0; i < populationSize; i++) {
+            if (populationFitness[i] > populationFitness[bestIndividualIndex]) {
+                bestIndividualIndex = i;
+            }
+        }
+        return bestIndividualIndex;
+    }
+
     /**select two parents using roulette selection*/
-    private void selectTwoParents(Individual[] population, float[] populationFitness) {
+    private Individual[] selectTwoParents(Individual[] population, float[] populationFitness) {
         Individual[] selection = new Individual[PARENTS];
         float[] cumulativeSelectionChance = generateRouletteWheel(population, populationFitness);
         float selectionOne = (float) Math.random();
         float selectionTwo = (float) Math.random();
-        getSelectedParent();
+        selection[FIRST] = getSelectedParent(selectionOne, cumulativeSelectionChance, population);
+        selection[SECOND] = getSelectedParent(selectionTwo, cumulativeSelectionChance, population);
+        return selection;
     }
 
+    /**generate an array of cumulative selection chances with index order == population index order*/
     private float[] generateRouletteWheel(Individual[] population, float[] populationFitness) {
-        // calc total population fitness
-        float populationTotalFitness = calculateTotalPopulationFitness();
-
-        float[] individualRelativeFitnessPercentage = new float[POPULATION_SIZE];
+        float populationTotalFitness = calculateSumOfPopulationFitness(populationFitness);
+        float[] individualRelativeFitnessPercentage = new float[populationSize];
         float cumulativeFitness = 0f;
-        for (int j = 0; j < POPULATION_SIZE; j++) {
+        for (int j = 0; j < populationSize; j++) {
             float currentIndividualRelativeFitness = populationFitness[j] / populationTotalFitness;
             float cumulativeSelectionChance = currentIndividualRelativeFitness + cumulativeFitness;
             individualRelativeFitnessPercentage[j] = cumulativeSelectionChance;
+            cumulativeFitness += currentIndividualRelativeFitness;
         }
         return individualRelativeFitnessPercentage;
     }
 
-    private float calculateTotalPopulationFitness(float[] populationFitness) {
+    /**gets the summed population fitness*/
+    private float calculateSumOfPopulationFitness(float[] populationFitness) {
         float populationTotalFitness = 0f;
-        for (int i = 0; i < POPULATION_SIZE; i++) {
+        for (int i = 0; i < populationSize; i++) {
             populationTotalFitness += populationFitness[i];
         }
         return populationTotalFitness;
     }
 
     /**Linear search, it's just 32 individuals*/
-    private void getSelectedParent(float selectedParent, float[] cumulativeSelectionChances) {
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            if(selectedParent > cumulativeSelectionChances[i]) {
-                return i;
+    private Individual getSelectedParent(float selectedParent, float[] cumulativeSelectionChances, Individual[] population) {
+        Individual parent = null;
+        for (int i = 0; i < populationSize; i++) {
+            if(parentFound(selectedParent, cumulativeSelectionChances, i)){
+                parent =  population[i];
             }
         }
+        return parent;
     }
 
-    //private Individual[] crossover(Individual[] parents) {
-        /**return 2 offspring*/
+    /**determines if the current "roulette wheel slot" is the winner */
+    private boolean parentFound(float selection, float[] cumulativeSelectionChances, int index) {
+        float currentRouletteWheelSlot = cumulativeSelectionChances[index];
+        if(selection > currentRouletteWheelSlot) {
+            float nextContender = cumulativeSelectionChances[index + NEXT];
+            if ((selection < nextContender) || index + NEXT == cumulativeSelectionChances.length) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    //}
+    /**Return 2 offspring using single point crossover*/
+    private Individual[] crossover(Individual[] selectedParents) {
+        Individual[] offspring = selectedParents;
+        if (Math.random() <= crossoverRate) {
+            offspring = performCrossoverGenesplicing(selectedParents[FIRST], selectedParents[SECOND]);
+        }
+        return offspring;
+    }
 
-    private Individual mutateIndividual(Individual individual) {
-        return new Individual();
+    /**create a child with a geneSequence that's a combination of parent 1 and 2. Forces crossover point to be between
+     * 1 and geneSequence.length() -1 to ensure crossover.*/
+    private Individual[] performCrossoverGenesplicing(Individual currentParent, Individual otherParent) {
+        Individual[] offspring = new Individual[PARENTS];
+        print("1- " + currentParent.getGeneSequence() + " -2- " + otherParent.getGeneSequence());
+        int crossoverPoint = LOWER_BOUND + rand.nextInt((GENE_SIZE - UPPER_BOUND));
+        String newGeneSequenceFirstSlice = currentParent.getGeneSequence().substring(SEQUENCE_START, crossoverPoint);
+        String newGeneSequenceSecondSlice = otherParent.getGeneSequence().substring(crossoverPoint, GENE_SIZE);
+        String secondNewGeneSequenceFirstSlice = otherParent.getGeneSequence().substring(SEQUENCE_START, crossoverPoint);
+        String secondNewGeneSequenceSecondSlice = currentParent.getGeneSequence().substring(crossoverPoint, GENE_SIZE);
+        String childGeneSequence = newGeneSequenceFirstSlice + newGeneSequenceSecondSlice;
+        String secondChildGeneSequence = secondNewGeneSequenceFirstSlice + secondNewGeneSequenceSecondSlice;
+        Individual childOne = IndividualFactory.spawnIndividualWithGenes(childGeneSequence);
+        Individual childTwo = IndividualFactory.spawnIndividualWithGenes(secondChildGeneSequence);
+        offspring[FIRST] = childOne;
+        offspring[SECOND] = childTwo;
+        return offspring;
+    }
+
+    /**mutate an individual's genesequence, return the mutated sequence*/
+    private String mutateGeneSequence(String geneSequence) {
+        String geneSequenceAfterMutation = "";
+        for(int i = 0; i < geneSequence.length(); i++) {
+            String currentGene = Character.toString(geneSequence.charAt(i));
+            if(Math.random() <= mutationRate) {
+                currentGene = mutateGene(currentGene);
+            }
+            geneSequenceAfterMutation += currentGene;
+        }
+        return geneSequenceAfterMutation;
+    }
+
+    /**turn 0s to 1s and vice versa*/
+    private String mutateGene(String gene) {
+        if(gene == ACTIVE) {
+            gene = INACTIVE;
+        }
+        else if (gene == INACTIVE) {
+            gene = ACTIVE;
+        }
+        return gene;
+    }
+
+    private void print(String message){
+        System.out.println(message);
     }
 
 

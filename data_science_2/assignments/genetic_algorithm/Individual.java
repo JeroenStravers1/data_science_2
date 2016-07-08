@@ -6,17 +6,8 @@ package genetic_algorithm;
 public class Individual {
 
     private String geneSequence;
-    private float fitness;
 
     public Individual() {
-    }
-
-    public float getFitness() {
-        return fitness;
-    }
-
-    public void setFitness(float fitness) {
-        this.fitness = fitness;
     }
 
     public String getGeneSequence() {
