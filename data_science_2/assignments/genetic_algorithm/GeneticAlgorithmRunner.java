@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class GeneticAlgorithmRunner {
 
     private static final String START_UP_GREET = "-++- Greetings, human. I am Genetic Algorithmator 5000 -++-";
-    private static final String START_UP_STATE_PURPOSE = "-++- I can perform K-Means clustering for you. -++-";
+    private static final String START_UP_STATE_PURPOSE = "-++- I can perform a Genetic Algorithm. -++-";
     private static final String INPUT_CROSSOVERRATE = "-++- Please enter the crossover rate as decimals (double) and press enter -++-";
     private static final String INPUT_MUTATIONRATE = "-++- Enter the mutation rate as decimals (double) and press enter -++-";
     private static final String INPUT_ELITISM = "-++- Please specify if elitism should be applied (1 or 0, int) and press enter -++-";

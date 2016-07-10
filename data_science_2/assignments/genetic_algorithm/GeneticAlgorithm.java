@@ -44,39 +44,9 @@ public class GeneticAlgorithm {
     public void runForNumIterations() {
         String[] initialGenePool = generateInitialGenes();
         Individual[] population = createPopulation(initialGenePool);
-        for(Individual indy:population){print("INITPOP " + indy.getGeneSequence());}
         float[] populationFitness = calculateFitnessForEachIndividual(population);
         for (int i = 0; i < numIterations; i++){
-            Individual[] newPopulation = new Individual[populationSize];
-            int startPopulationIndex = 0;
-            // apply elitism (transfer the single best Individual to the new population without modification)
-            if (elitism) {
-                int bestIndividualIndex = getBestIndividualIndex(populationFitness);
-                newPopulation[FIRST] = population[bestIndividualIndex];
-                startPopulationIndex = 1;
-            }
-            for(int k = startPopulationIndex; k < populationSize; k+=2) {
-                // get parents
-                Individual[] selectedParents = selectTwoParents(population, populationFitness);
-                // crossover
-                Individual[] offspring = crossover(selectedParents);
-                // mutate
-                for (Individual individual: offspring) {
-                    String currentGeneSequence = individual.getGeneSequence();
-                    String mutatedGeneSequence = mutateGeneSequence(currentGeneSequence);
-                    individual.setGeneSequence(mutatedGeneSequence);
-                }
-                // storeOffspringInPopulation
-                newPopulation[k] = offspring[FIRST];
-                try{
-                    newPopulation[k + NEXT] = offspring[SECOND];
-                }
-                catch(Exception e) {} // only there for uneven population sizes
-
-            }
-            population = newPopulation;
-            // calculate fitness
-            print("\n-----");
+            population = createNewGeneration(population, populationFitness);
             populationFitness = calculateFitnessForEachIndividual(population);
         }
         float totalPopulationFitness = calculateSumOfPopulationFitness(populationFitness);
@@ -88,11 +58,13 @@ public class GeneticAlgorithm {
                 bestIndividualIndex = i;
             }
         }
-        System.out.println(RESULT_BEST_INDIVIDUAL_SEQUENCE + population[bestIndividualIndex].getGeneSequence());
+        String bestGeneSequence = population[bestIndividualIndex].getGeneSequence();
+        int geneSequenceReadableValue = Integer.parseInt(bestGeneSequence, 2);
+        System.out.println(RESULT_BEST_INDIVIDUAL_SEQUENCE + bestGeneSequence + " (" + geneSequenceReadableValue + ")");
         System.out.println(RESULT_BEST_INDIVIDUAL_FITNESS + populationFitness[bestIndividualIndex]);
     }
 
-    /**generate a list of random genesequences for the initial population*/ 
+    /**generate a list of random genesequences for the initial population*/
     private String[] generateInitialGenes() {
         Random rand = new Random();
         String[] generatedGenes = new String[populationSize];
@@ -130,6 +102,37 @@ public class GeneticAlgorithm {
         int interpretedGeneSequence = Integer.parseInt(individual.getGeneSequence(), 2);
         float fitness = (-1 * (interpretedGeneSequence * interpretedGeneSequence)) + (7 * interpretedGeneSequence);
         return fitness;
+    }
+
+    /**create and return a new generation*/
+    private Individual[] createNewGeneration(Individual[] population, float[] populationFitness) {
+        Individual[] newPopulation = new Individual[populationSize];
+        int startPopulationIndex = 0;
+        // apply elitism (transfer the single best Individual to the new population without modification)
+        if (elitism) {
+            int bestIndividualIndex = getBestIndividualIndex(populationFitness);
+            newPopulation[FIRST] = population[bestIndividualIndex];
+            startPopulationIndex = 1;
+        }
+        for (int k = startPopulationIndex; k < populationSize; k += 2) {
+            // get parents
+            Individual[] selectedParents = selectTwoParents(population, populationFitness);
+            // crossover
+            Individual[] offspring = crossover(selectedParents);
+            // mutate
+            for (Individual individual : offspring) {
+                String currentGeneSequence = individual.getGeneSequence();
+                String mutatedGeneSequence = mutateGeneSequence(currentGeneSequence);
+                individual.setGeneSequence(mutatedGeneSequence);
+            }
+            // storeOffspringInPopulation
+            newPopulation[k] = offspring[FIRST];
+            try {
+                newPopulation[k + NEXT] = offspring[SECOND];
+            } catch (Exception e) {
+            } // only there for uneven population sizes
+        }
+        return newPopulation;
     }
 
     /**get the index identifying the most fit individual*/
