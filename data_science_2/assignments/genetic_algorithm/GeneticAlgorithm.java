@@ -49,6 +49,7 @@ public class GeneticAlgorithm {
         for (int i = 0; i < numIterations; i++){
             Individual[] newPopulation = new Individual[populationSize];
             int startPopulationIndex = 0;
+            // apply elitism (transfer the single best Individual to the new population without modification)
             if (elitism) {
                 int bestIndividualIndex = getBestIndividualIndex(populationFitness);
                 newPopulation[FIRST] = population[bestIndividualIndex];
@@ -57,17 +58,15 @@ public class GeneticAlgorithm {
             for(int k = startPopulationIndex; k < populationSize; k+=2) {
                 // get parents
                 Individual[] selectedParents = selectTwoParents(population, populationFitness);
-                System.out.println("selpar" +selectedParents[0] + selectedParents[1]);
                 // crossover
                 Individual[] offspring = crossover(selectedParents);
-                System.out.println("seloff" +offspring[0] + offspring[1]);
                 // mutate
                 for (Individual individual: offspring) {
                     String currentGeneSequence = individual.getGeneSequence();
                     String mutatedGeneSequence = mutateGeneSequence(currentGeneSequence);
                     individual.setGeneSequence(mutatedGeneSequence);
                 }
-                // store in population
+                // storeOffspringInPopulation
                 newPopulation[k] = offspring[FIRST];
                 try{
                     newPopulation[k + NEXT] = offspring[SECOND];
@@ -78,8 +77,6 @@ public class GeneticAlgorithm {
             population = newPopulation;
             // calculate fitness
             print("\n-----");
-            for(Individual in: population) System.out.println("population"+in);
-
             populationFitness = calculateFitnessForEachIndividual(population);
         }
         float totalPopulationFitness = calculateSumOfPopulationFitness(populationFitness);
@@ -95,7 +92,7 @@ public class GeneticAlgorithm {
         System.out.println(RESULT_BEST_INDIVIDUAL_FITNESS + populationFitness[bestIndividualIndex]);
     }
 
-    /**generate a list of random genesequences for the initial population*/ //TODO +
+    /**generate a list of random genesequences for the initial population*/ 
     private String[] generateInitialGenes() {
         Random rand = new Random();
         String[] generatedGenes = new String[populationSize];
@@ -110,7 +107,7 @@ public class GeneticAlgorithm {
         return generatedGenes;
     }
 
-    /**create population from geneSequences*/ //TODO+
+    /**create population from geneSequences*/
     private Individual[] createPopulation(String[] geneSequences) {
         Individual[] population = new Individual[populationSize];
         for(int i = 0; i < populationSize; i++) {
@@ -194,11 +191,8 @@ public class GeneticAlgorithm {
     /**determines if the current "roulette wheel slot" is the winner */
     private boolean parentFound(float selection, float[] cumulativeSelectionChances, int index) {
         float currentRouletteWheelSlot = cumulativeSelectionChances[index];
-        if(selection > currentRouletteWheelSlot) {
-            float nextContender = cumulativeSelectionChances[index + NEXT];
-            if ((selection < nextContender) || index + NEXT == cumulativeSelectionChances.length) {
-                return true;
-            }
+        if(selection <= currentRouletteWheelSlot) {
+            return true;
         }
         return false;
     }
@@ -216,7 +210,6 @@ public class GeneticAlgorithm {
      * 1 and geneSequence.length() -1 to ensure crossover.*/
     private Individual[] performCrossoverGenesplicing(Individual currentParent, Individual otherParent) {
         Individual[] offspring = new Individual[PARENTS];
-        print("1- " + currentParent.getGeneSequence() + " -2- " + otherParent.getGeneSequence());
         int crossoverPoint = LOWER_BOUND + rand.nextInt((GENE_SIZE - UPPER_BOUND));
         String newGeneSequenceFirstSlice = currentParent.getGeneSequence().substring(SEQUENCE_START, crossoverPoint);
         String newGeneSequenceSecondSlice = otherParent.getGeneSequence().substring(crossoverPoint, GENE_SIZE);
