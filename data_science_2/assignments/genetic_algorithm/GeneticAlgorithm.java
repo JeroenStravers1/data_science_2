@@ -149,26 +149,30 @@ public class GeneticAlgorithm {
     /**select two parents using roulette selection*/
     private Individual[] selectTwoParents(Individual[] population, float[] populationFitness) {
         Individual[] selection = new Individual[PARENTS];
-        float[] cumulativeSelectionChance = generateRouletteWheel(population, populationFitness);
+        float[] cumulativeSelectionChance = generateRouletteWheel(populationFitness);
         float selectionOne = (float) Math.random();
-        float selectionTwo = (float) Math.random();
         selection[FIRST] = getSelectedParent(selectionOne, cumulativeSelectionChance, population);
-        selection[SECOND] = getSelectedParent(selectionTwo, cumulativeSelectionChance, population);
+        selection[SECOND] = selection[FIRST];
+        while (selection[SECOND] == selection[FIRST]) {
+            //print("" + selection[FIRST].getGeneSequence() + "reselecting" + selection[SECOND].getGeneSequence());
+            float selectionTwo = (float) Math.random();
+            selection[SECOND] = getSelectedParent(selectionTwo, cumulativeSelectionChance, population);
+        }
         return selection;
     }
 
     /**generate an array of cumulative selection chances with index order == population index order*/
-    private float[] generateRouletteWheel(Individual[] population, float[] populationFitness) {
-        float populationTotalFitness = calculateSumOfPopulationFitness(populationFitness);
-        float[] individualRelativeFitnessPercentage = new float[populationSize];
+    private float[] generateRouletteWheel(float[] populationFitness) {
+        float[] cumulativeFitnessPercentages = new float[populationSize];
         float cumulativeFitness = 0f;
         for (int j = 0; j < populationSize; j++) {
-            float currentIndividualRelativeFitness = populationFitness[j] / populationTotalFitness;
-            float cumulativeSelectionChance = currentIndividualRelativeFitness + cumulativeFitness;
-            individualRelativeFitnessPercentage[j] = cumulativeSelectionChance;
-            cumulativeFitness += currentIndividualRelativeFitness;
+            float relativeFitness = getRelativeFitness(populationFitness, populationFitness[j]);
+            float cumulativeSelectionChance = relativeFitness + cumulativeFitness;
+            cumulativeFitnessPercentages[j] = cumulativeSelectionChance;
+            cumulativeFitness += relativeFitness;
         }
-        return individualRelativeFitnessPercentage;
+        for(float chance:cumulativeFitnessPercentages)print(""+chance);
+        return cumulativeFitnessPercentages;
     }
 
     /**gets the summed population fitness*/
@@ -180,12 +184,30 @@ public class GeneticAlgorithm {
         return populationTotalFitness;
     }
 
+    /**get the current Individual's fitness relative to the population total*/
+    private float getRelativeFitness(float[] populationFitness, float currentFitness) {
+        float min = populationFitness[FIRST];
+        float max = populationFitness[FIRST];
+        float total = 0;
+        for (float fitness: populationFitness) {
+            if(fitness < min) min = fitness;
+            if(fitness > max) max = fitness;
+        }
+        float minAsPositiveValue = (float) Math.sqrt((min*min));
+        for (float fitness: populationFitness) {
+            total += fitness + minAsPositiveValue;
+        }
+        float fitnessPercentage = (currentFitness + minAsPositiveValue) / total;
+        return fitnessPercentage;
+    }
+
     /**Linear search, it's just 32 individuals*/
     private Individual getSelectedParent(float selectedParent, float[] cumulativeSelectionChances, Individual[] population) {
         Individual parent = null;
         for (int i = 0; i < populationSize; i++) {
             if(parentFound(selectedParent, cumulativeSelectionChances, i)){
-                parent =  population[i];
+                parent = population[i];
+                return parent;
             }
         }
         return parent;
