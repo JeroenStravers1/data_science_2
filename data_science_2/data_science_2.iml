@@ -11,5 +11,8 @@
     <orderEntry type="library" name="poi-ooxml-3.14-20160307" level="project" />
     <orderEntry type="library" name="poi-ooxml-schemas-3.14-20160307" level="project" />
     <orderEntry type="library" name="xmlbeans-2.6.0" level="project" />
+    <orderEntry type="library" name="jcommon-1.0.23" level="project" />
+    <orderEntry type="library" name="jfreechart-1.0.19" level="project" />
+    <orderEntry type="library" name="servlet" level="project" />
   </component>
 </module>
