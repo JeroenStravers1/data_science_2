@@ -41,8 +41,8 @@
       <file leaf-file-name="Forecaster.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assignments/forecasting/Forecaster.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6184211" vertical-offset="831" max-vertical-offset="1768">
-              <caret line="71" column="33" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.51932776" vertical-offset="1323" max-vertical-offset="1955">
+              <caret line="96" column="60" selection-start-line="96" selection-start-column="60" selection-end-line="96" selection-end-column="60" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -53,10 +53,14 @@
       <file leaf-file-name="DoubleExponentialSmoother.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/assignments/forecasting/DoubleExponentialSmoother.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="922" max-vertical-offset="1632">
-              <caret line="74" column="49" selection-start-line="74" selection-start-column="49" selection-end-line="74" selection-end-column="49" />
+            <state vertical-scroll-proportion="-40.392857" vertical-offset="144" max-vertical-offset="1598">
+              <caret line="75" column="36" selection-start-line="75" selection-start-column="36" selection-end-line="75" selection-end-column="36" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#2041#2048#0" expanded="true" />
+                <element signature="e#2104#2111#0" expanded="true" />
+                <element signature="e#2188#2206#0" expanded="true" />
+                <element signature="e#3322#3329#0" expanded="true" />
+                <element signature="e#3808#3815#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -65,8 +69,20 @@
       <file leaf-file-name="ExponentialSmoother.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/assignments/forecasting/ExponentialSmoother.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="273" max-vertical-offset="1003">
-              <caret line="49" column="33" selection-start-line="49" selection-start-column="33" selection-end-line="49" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="327" max-vertical-offset="969">
+              <caret line="16" column="54" selection-start-line="16" selection-start-column="54" selection-end-line="16" selection-end-column="54" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SimpleExponentialSmoother.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assignments/forecasting/SimpleExponentialSmoother.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.892857" vertical-offset="844" max-vertical-offset="1666">
+              <caret line="61" column="78" selection-start-line="61" selection-start-column="72" selection-end-line="61" selection-end-column="78" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,10 +98,10 @@
         <option value="$PROJECT_DIR$/assignments/genetic_algorithm/GeneticAlgorithm.java" />
         <option value="$PROJECT_DIR$/assignments/genetic_algorithm/GeneticAlgorithmRunner.java" />
         <option value="$PROJECT_DIR$/assignments/forecasting/DataExtractor.java" />
-        <option value="$PROJECT_DIR$/assignments/forecasting/Forecaster.java" />
+        <option value="$PROJECT_DIR$/assignments/forecasting/SimpleExponentialSmoother.java" />
         <option value="$PROJECT_DIR$/assignments/forecasting/ExponentialSmoother.java" />
         <option value="$PROJECT_DIR$/assignments/forecasting/DoubleExponentialSmoother.java" />
-        <option value="$PROJECT_DIR$/assignments/forecasting/SimpleExponentialSmoother.java" />
+        <option value="$PROJECT_DIR$/assignments/forecasting/Forecaster.java" />
       </list>
     </option>
   </component>
@@ -536,12 +552,12 @@
       <option name="number" value="Default" />
       <updated>1468225464787</updated>
       <workItem from="1468225466167" duration="14255000" />
-      <workItem from="1468321202038" duration="5554000" />
+      <workItem from="1468321202038" duration="8959000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19809000" />
+    <option name="totallyTimeSpent" value="23214000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -654,7 +670,11 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="289">
           <caret line="3" column="29" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#2041#2048#0" expanded="true" />
+            <element signature="e#2104#2111#0" expanded="true" />
+            <element signature="e#2188#2206#0" expanded="true" />
+            <element signature="e#3322#3329#0" expanded="true" />
+            <element signature="e#3808#3815#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -691,10 +711,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/assignments/forecasting/SimpleExponentialSmoother.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.892857" vertical-offset="844" max-vertical-offset="1666">
+          <caret line="61" column="78" selection-start-line="61" selection-start-column="72" selection-end-line="61" selection-end-column="78" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/assignments/forecasting/ExponentialSmoother.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="273" max-vertical-offset="1003">
-          <caret line="49" column="33" selection-start-line="49" selection-start-column="33" selection-end-line="49" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="969">
+          <caret line="16" column="54" selection-start-line="16" selection-start-column="54" selection-end-line="16" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -703,28 +733,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assignments/forecasting/DoubleExponentialSmoother.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="922" max-vertical-offset="1632">
-          <caret line="74" column="49" selection-start-line="74" selection-start-column="49" selection-end-line="74" selection-end-column="49" />
+        <state vertical-scroll-proportion="-40.392857" vertical-offset="144" max-vertical-offset="1598">
+          <caret line="75" column="36" selection-start-line="75" selection-start-column="36" selection-end-line="75" selection-end-column="36" />
           <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assignments/forecasting/SimpleExponentialSmoother.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2857143" vertical-offset="1071" max-vertical-offset="1666">
-          <caret line="73" column="49" selection-start-line="73" selection-start-column="49" selection-end-line="73" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#2041#2048#0" expanded="true" />
+            <element signature="e#2104#2111#0" expanded="true" />
+            <element signature="e#2188#2206#0" expanded="true" />
+            <element signature="e#3322#3329#0" expanded="true" />
+            <element signature="e#3808#3815#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/assignments/forecasting/Forecaster.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6184211" vertical-offset="831" max-vertical-offset="1768">
-          <caret line="71" column="33" selection-start-line="71" selection-start-column="33" selection-end-line="71" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.51932776" vertical-offset="1323" max-vertical-offset="1955">
+          <caret line="96" column="60" selection-start-line="96" selection-start-column="60" selection-end-line="96" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

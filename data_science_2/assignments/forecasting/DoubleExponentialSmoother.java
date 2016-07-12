@@ -1,14 +1,5 @@
 package forecasting;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -16,75 +7,82 @@ import java.util.ArrayList;
  */
 public class DoubleExponentialSmoother extends ExponentialSmoother {
 
-    private static final int ALPHA_AND_SSE = 2;
+    private static final int SSE_ALPHA_BETA = 3;
     private static final int ALPHA = 1;
     private static final int SSE = 0;
+    private static final int BETA = 2;
+    private static final int SMOOTHENED = 0;
+    private static final int TREND = 1;
+    private static final int FIRST = 0;
+    private static final int SECOND = 1;
 
-    /**get the best alpha value (the alpha value causing the lowest SSE)*/
-    public float[] calculateBestSSEAndAlpha(ArrayList<Integer> actualValues) {
-        float smallestSse = Float.MAX_VALUE;
+    /**get the alpha and beta values that lead to the lowest SSE*/
+    public float[] getSSEAndAlphaAndBeta(ArrayList<Integer> actualValues) { //TODO +
+        float[] SSEAlphaBeta = new float[SSE_ALPHA_BETA];
+        float smallestSSE = Float.MAX_VALUE;
         float bestAlpha = 0;
-        float[] AlphaAndSSE = new float[ALPHA_AND_SSE];
-        for (float alpha = INITIAL_ALPHA; alpha <= 1; alpha += INCREMENT_ALPHA) {
-            ArrayList<Float> smoothenedValues = applySmoothing(actualValues, alpha);
-            float sse = calculateSSE(ALPHA_N_MODIFYER, smoothenedValues, actualValues);
-            if(sse < smallestSse){
-                smallestSse = sse;
-                bestAlpha = alpha;
+        float bestBeta  = 0;
+        for (float alpha = INITIAL_ALPHA; alpha < 1; alpha += INCREMENT_ALPHA) {
+            for (float beta = INITIAL_ALPHA; beta < 1 ; beta += INCREMENT_ALPHA) {
+                ArrayList<ArrayList<Float>> smoothenedAndTrendValues = calculateSmoothingAndTrend(actualValues, alpha, beta);
+                ArrayList<Float> initialForecastSeq = getInitialForecastValue(smoothenedAndTrendValues.get(SMOOTHENED),
+                        smoothenedAndTrendValues.get(TREND));
+                float SSE = calculateSSE(BETA_N_MODIFIER, initialForecastSeq, actualValues);
+                if(SSE < smallestSSE){
+                    smallestSSE = SSE;
+                    bestAlpha = alpha;
+                    bestBeta = beta;
+                }
             }
         }
-        AlphaAndSSE[ALPHA] = bestAlpha;
-        AlphaAndSSE[SSE] = smallestSse;
-        return AlphaAndSSE;
+        SSEAlphaBeta[SSE] = smallestSSE;
+        SSEAlphaBeta[ALPHA] = bestAlpha;
+        SSEAlphaBeta[BETA] = bestBeta;
+        return SSEAlphaBeta;
     }
 
-    /**initialize the smoothed list by taking the average of the first 12 datapoints*/
-    protected float initialize(ArrayList<Integer> actualValues) {
-        float sumOfFirstTwelveValues = 0;
-        for (int i = 0; i < FIRST_TWELVE_DATAPOINTS; i++) {
-            sumOfFirstTwelveValues += actualValues.get(i);
-        }
-        float initializedValue = sumOfFirstTwelveValues / FIRST_TWELVE_DATAPOINTS;
-        return initializedValue;
-    }
-
-    /**applies simple exponential smoothing to the dataset*/
-    protected ArrayList<Float> applySmoothing(ArrayList<Integer> actualValues, float alpha) {
+    /**calculate smoothing and trend values*/
+    public ArrayList<ArrayList<Float>> calculateSmoothingAndTrend(ArrayList<Integer> actualValues, float alpha,
+                                                                  float beta) { //TODO +
         ArrayList<Float> smoothenedValues = new ArrayList<Float>();
-        smoothenedValues.add(initialize(actualValues));
+        ArrayList<Float> trendValues = new ArrayList<Float>();
+        ArrayList<ArrayList<Float>> trendAndSmoothingList = new ArrayList<ArrayList<Float>>();
+        smoothenedValues.add((float)actualValues.get(FIRST));
+        trendValues.add((float) actualValues.get(SECOND) - actualValues.get(FIRST));
+        int currentIndex = 1;
         for (int i = 1; i < actualValues.size(); i++) {
-            float smoothenedValue = (alpha * actualValues.get(i - 1)) + ((1 - alpha) * smoothenedValues.get(i - 1));
+            float smoothenedValue = alpha * actualValues.get(currentIndex) + (1 - alpha)
+                    * (smoothenedValues.get(currentIndex - 1) + trendValues.get(currentIndex - 1));
             smoothenedValues.add(smoothenedValue);
+            float trendValue = beta * (smoothenedValues.get(currentIndex) - smoothenedValues.get(currentIndex - 1))
+                    + (1 - beta) * trendValues.get(currentIndex - 1);
+            trendValues.add(trendValue);
+            currentIndex++;
         }
-        return smoothenedValues;
+        trendAndSmoothingList.add(smoothenedValues);
+        trendAndSmoothingList.add(trendValues);
+        return trendAndSmoothingList;
     }
 
-    /**applies forecasting to the smoothened dataset*/
-    protected void applyForecastingToSmoothenedDataset(float alpha, int desiredForecastLength,
-                                                       ArrayList<Integer> actualValues, ArrayList<Float> smoothenedValues) {
-        ArrayList<Float> forecastedValues = smoothenedValues;
-        float finalSmoothenedValue = alpha * actualValues.get(actualValues.size() - 1) + (1 - alpha)
-                * smoothenedValues.get(smoothenedValues.size() - 1);
-        for (int i = 0; i < desiredForecastLength; i++) {
-            forecastedValues.add(finalSmoothenedValue);
+    /**initialize the forecasting list*/ //TODO+
+    private ArrayList<Float> getInitialForecastValue(ArrayList<Float> smoothenedValues, ArrayList<Float> trendValues) {
+        ArrayList<Float> initialForecasting = new ArrayList<Float>();
+        for (int i = 1; i < smoothenedValues.size(); i++) {
+            initialForecasting.add(smoothenedValues.get(i) + trendValues.get(i));
         }
+        return initialForecasting;
     }
 
-    /**plots a graph based on the outcomes*/
-    protected JPanel plotGraph(ArrayList<Integer> actualValues, ArrayList<Float> smoothenedValues,
-                               double bestAlpha, double smallestSSE) {
-        String chartTitle = String.format("Forecast (SES): demand for Anduril\n" +
-                "best Alpha %.2f  sse %.2f", bestAlpha, smallestSSE);
-        JFreeChart chart = ChartFactory.createXYLineChart(chartTitle, "Months", "Demand",
-                createDataset(actualValues, smoothenedValues),
-                PlotOrientation.VERTICAL, true, false, false);
-        XYPlot plot = chart.getXYPlot();
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, Color.BLUE);
-        renderer.setSeriesPaint(1, Color.RED);
-        renderer.setSeriesStroke(0, new BasicStroke(3.0f));
-        renderer.setSeriesStroke(1, new BasicStroke(2.0f));
-        plot.setRenderer(renderer);
-        return new ChartPanel(chart);
+    /**perform forecasting*/ //TODO+
+    protected ArrayList<Float> getForecastValues(ArrayList<Float> smoothenedValues, ArrayList<Float> trendValues,
+                                                    int desiredForecastLength) {
+        ArrayList<Float> forecast = new ArrayList<Float>();
+        float lastSmoothenedValue = smoothenedValues.get(smoothenedValues.size() - 1);
+        float lastTrendValue = trendValues.get(trendValues.size() - 1);
+        for (int i = 1; i <= desiredForecastLength; i++) {
+            forecast.add(lastSmoothenedValue + (i * lastTrendValue));
+        }
+        return forecast;
     }
+
 }

@@ -14,10 +14,8 @@ public abstract class ExponentialSmoother {
     protected static final int ALPHA_N_MODIFYER = -1;
     protected static final int BETA_N_MODIFIER = -2;
     protected static final int FIRST_TWELVE_DATAPOINTS = 12;
-    protected static final float INITIAL_ALPHA = 0f;
+    protected static final float INITIAL_ALPHA = 0.001f;
     protected static final float INCREMENT_ALPHA = 0.001f;
-
-    protected abstract float initialize(ArrayList<Integer> actualValues);
 
     /**calculate the sum of squared errors*/
     protected float calculateSSE(int nModifyer, ArrayList<Float> projectedValues, ArrayList<Integer> actualValues) {

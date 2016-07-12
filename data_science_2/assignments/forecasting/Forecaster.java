@@ -15,9 +15,11 @@ public class Forecaster {
     private static final int Y = 1;
     private static final int SSE = 0;
     private static final int ALPHA = 1;
-    private static final int BETA = 1;
+    private static final int BETA = 2;
     private static final int DESIRED_FORECAST_LENGTH = 12;
     private static final int X_AXIS_INTERVAL = 1;
+    private static final int SMOOTHENED = 0;
+    private static final int TREND = 1;
 
     private DataExtractor dataExtractor;
     private SimpleExponentialSmoother simpleExponentialSmoother;
@@ -58,6 +60,7 @@ public class Forecaster {
 
         extendXAxisWithDesiredForecastLength();
         performForecastingWithSES();
+        performForecastingWithDES();
 
     }
 
@@ -68,8 +71,7 @@ public class Forecaster {
             int lastXValue = extractedXValues.get(lastXValueIndex - 1);
             extractedXValues.add(lastXValue + X_AXIS_INTERVAL);
         }
-    } //TODO pak de code voor het laatste punt op de graph
-    //TODO check alpha appliance!
+    }
 
     private void performForecastingWithSES() {
         float[] bestAlphaAndSSE = simpleExponentialSmoother.calculateBestSSEAndAlpha(extractedYValues);
@@ -85,12 +87,21 @@ public class Forecaster {
         jFrame.setVisible(true);
     }
 
-    /**placeholder*/
-    private void performForecastingWithDES(ArrayList<Integer> extractedValues) {
-        float[] bestAlphaAndSSE = simpleExponentialSmoother.calculateBestSSEAndAlpha(extractedValues);
-        ArrayList<Float> smoothenedValues = simpleExponentialSmoother.applySmoothing(extractedValues, bestAlphaAndSSE[ALPHA]);
-        /*ArrayList<Float> smoothenedValuesWithForecast = simpleExponentialSmoother.applyForecastingToSmoothenedDataset(
-                bestAlphaAndSSE[ALPHA], DESIRED_FORECAST_LENGTH, extractedValues, smoothenedValues);*/
+    private void performForecastingWithDES() {
+        float[] SSEAlphaBeta = doubleExponentialSmoother.getSSEAndAlphaAndBeta(extractedYValues);
+        ArrayList<ArrayList<Float>> smoothenedAndTrendValues = doubleExponentialSmoother.calculateSmoothingAndTrend(
+                extractedYValues, SSEAlphaBeta[ALPHA], SSEAlphaBeta[BETA]);
+        ArrayList<Float> forecastValues = doubleExponentialSmoother.getForecastValues(
+                smoothenedAndTrendValues.get(SMOOTHENED), smoothenedAndTrendValues.get(TREND), DESIRED_FORECAST_LENGTH);
+
+//TODO alleen de plotting nog nu. Dan ben je hopelijk klaar.
+        JFrame jFrame = new JFrame();
+        jFrame.setTitle("DES ASSIGNMENT");
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jFrame.setContentPane(plotGraph(dataSequence,trendAndSmoothSeq.get(1),forecastValues,
+                alphaBetaSSE[0],alphaBetaSSE[1],alphaBetaSSE[2]));
+        jFrame.pack();
+        jFrame.setVisible(true);
     }
 
 
